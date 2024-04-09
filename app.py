@@ -4,40 +4,27 @@ from PIL import Image
 from utils import utils
 from lyzr_qa import question_generation
 
-st.set_page_config(
-    page_title="Lyzr-Question Answer Generation",
-    layout="centered",  # or "wide" 
-    initial_sidebar_state="auto",
-    page_icon="./logo/lyzr-logo-cut.png"
-)
+
+utils.page_config()
 
 data = "data"
 os.makedirs(data, exist_ok=True)
 
+image = Image.open("./logo/lyzr-logo.png")
+st.image(image, width=150)
 st.title('Lyzr-Question Answer Generation📚')
 st.markdown('Welcome to the lyzr Question Generation app, this app will help you to generate questions and their responses on given pdf file!!!')
 
-st.markdown("""
-    <style>
-    .reportview-container .main .block-container {
-        max-width: 1200px;
-        padding-top: 2rem;
-        padding-right: 3rem;
-        padding-left: 3rem;
-        padding-bottom: 2rem;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
-def rag_questions(topic, no_questions):
-    agent = question_generation()
-    metric = f""" You are an expert of this {topic}, Generate {no_questions} questions on {topic} that is clear, relevant, and specific."""
+def rag_response(topic, path):
+    agent = question_generation(path)
+    metric = f""" You are an expert of this {topic}. Tell me everything you know about this {topic}, Provide a detailed reponse on this {topic} from the given file"""
     response = agent.query(metric)
     return response.response
 
 
-def gpt_questions(topic, questions):
-    response = utils.llm_calling(user_prompt=f"Develop a set of questions on {questions} that is clear, relevant, and specific"
+def gpt_questions(response, topic, number):
+    response = utils.llm_calling(user_prompt=f"Develop some {number} numbers of questions on {response} that is clear, relevant, and specific which obeys the {topic}"
                                  f"[!important] Consider the context and purpose of the inquiry, aiming for open-endedness to encourage discussion or exploration. Engage the audience's curiosity while ensuring the question prompts meaningful responses",
                                    system_prompt=f"You are an expert of this {topic}",llm_model="gpt-4-turbo-preview")
     return response
@@ -55,28 +42,58 @@ def main():
     image = Image.open("./logo/lyzr-logo.png")
     st.sidebar.image(image, width=150)
     st.sidebar.subheader('Lyzr- QnA Generator')
-    file = st.sidebar.file_uploader("Upload a Subject Book Pdf", type=["pdf"])
-    if file:
-        utils.save_uploaded_file(file, directory_name=data)
 
-        user_topic = st.sidebar.text_input('Enter the topic according to subject')
-        number_questions = st.sidebar.text_input('Enter the number of questions')
+    selection = st.sidebar.radio("Select Any Option: ", ["Default File", "Upload File"])
+
+    if selection == 'Default File':
+        st.info('Default file: Object Oriented Programming')
+        st.markdown(""" ##### Topics can be:
+    1. Inheritance
+    2. Polymorphsim
+    3. Abstraction
+    4. Encapsulation               """)
+        path = './Object Oriented Programming.pdf'
+
+        user_topic = st.text_input('Enter the topic according to subject')
+        number_questions = st.text_input('Enter the number of questions')
 
         if user_topic is not None:
-            button=st.sidebar.button('Submit')
-            if (button==True):
-                rag_response = rag_questions(user_topic, number_questions)  # getting questions from rag
-                gpt_response = gpt_questions(user_topic, rag_response) # improve those questions with gpt call
-                gpt_answer = gpt_answers(questions=gpt_response, topic=user_topic) # create the responses for questions
+            if st.button('Submit'):
+                rag_generated_response = rag_response(topic=user_topic, path=path)  # getting reponse from rag about the subject/topic
+                gpt_response = gpt_questions(response=rag_generated_response, topic=user_topic, number=number_questions) # create n number of question on rag response
+                gpt_answer = gpt_answers(questions=gpt_response, topic=user_topic) # create the answers for the questions
                 st.subheader('Questions')
                 st.write(gpt_response)
                 st.markdown('---')
                 st.subheader('Answers')
                 st.write(gpt_answer)
+
+    if selection == 'Upload File':
+        file = st.file_uploader("Upload a Subject Book Pdf", type=["pdf"])
+        if file:
+            utils.save_uploaded_file(file, directory_name=data)
+            path = utils.get_files_in_directory(directory=data)
+            filepath = path[0] # get the first filepath
+
+            user_topic = st.text_input('Enter the topic according to subject')
+            number_questions = st.text_input('Enter the number of questions')
+
+            if user_topic is not None:
+                if st.button('Submit'):
+                    rag_generated_response = rag_response(topic=user_topic, path=filepath)  # getting reponse from rag about the subject/topic
+                    gpt_response = gpt_questions(response=rag_generated_response, topic=user_topic, number=number_questions) # create n number of question on rag response
+                    gpt_answer = gpt_answers(questions=gpt_response, topic=user_topic) # create the answers for the questions
+                    st.subheader('Questions')
+                    st.write(gpt_response)
+                    st.markdown('---')
+                    st.subheader('Answers')
+                    st.write(gpt_answer)
                 
-    else:
-        st.sidebar.warning('Please Upload subject pdf file!!!')
+        else:
+            st.warning('Please Upload subject pdf file!!!')
         
 
 if __name__ == "__main__":
+    utils.style_app()
     main()
+    utils.template_end()

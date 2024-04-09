@@ -36,7 +36,7 @@ def save_uploaded_file(uploaded_file, directory_name):
     file_path = os.path.join(directory_name, uploaded_file.name)
     with open(file_path, "wb") as file:
         file.write(uploaded_file.read())
-    st.sidebar.success("File uploaded successfully")
+    st.success("File uploaded successfully")
 
 
 def llm_calling(
@@ -77,4 +77,28 @@ def llm_calling(
         
         return response.choices[0].message.content
 
+def style_app():
+    # You can put your CSS styles here
+    st.markdown("""
+    <style>
+    .app-header { visibility: hidden; }
+    .css-18e3th9 { padding-top: 0; padding-bottom: 0; }
+    .css-1d391kg { padding-top: 1rem; padding-right: 1rem; padding-bottom: 1rem; padding-left: 1rem; }
+    </style>
+    """, unsafe_allow_html=True)
 
+def page_config(layout = "centered"):
+    st.set_page_config(
+        page_title="Lyzr-Question Answer Generation",
+        layout=layout,  # or "wide" 
+        initial_sidebar_state="auto",
+        page_icon="./logo/lyzr-logo-cut.png"
+    )
+
+def template_end():
+    with st.sidebar.expander("ℹ️ - About this App"):
+        st.sidebar.markdown("This app uses Lyzr's PDF QABot to generate Question and Answers realted on the provided topic.")
+        st.sidebar.link_button("Lyzr", url='https://www.lyzr.ai/', use_container_width = True)
+        st.sidebar.link_button("Book a Demo", url='https://www.lyzr.ai/book-demo/', use_container_width = True)
+        st.sidebar.link_button("Discord", url='https://discord.gg/nm7zSyEFA2', use_container_width = True)
+        st.sidebar.link_button("Slack", url='https://join.slack.com/t/genaiforenterprise/shared_invite/zt-2a7fr38f7-_QDOY1W1WSlSiYNAEncLGw', use_container_width = True)
