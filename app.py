@@ -32,9 +32,9 @@ def gpt_questions(response, topic, number):
 
 
 def gpt_answers(questions, topic):
-    answers = utils.llm_calling(user_prompt=f'Provide a detailed response to the following {questions}'
-                                f"[!important] Elaborating on relevant examples, concepts, and explanations to thoroughly explore the topic"
-                                f"[!important] Your answer should delve into the intricacies of the subject matter, drawing upon your understanding and expertise to provide comprehensive insights, provide an examples if, possible.", system_prompt=f'You are an expert of this {topic}', llm_model="gpt-4-turbo-preview")
+    answers = utils.llm_calling(user_prompt=f"""Provide a detailed response to the following {questions}, including relevant examples, explanations, and, if applicable, diagrams or code examples to illustrate your points. Additionally, consider discussing both the advantages and disadvantages of the topic to provide a comprehensive analysis.
+                                Your answer should aim to offer a well-rounded understanding of the subject matter, highlighting its complexities and implications."""
+                                , system_prompt=f'You are an expert of this {topic}', llm_model="gpt-4-turbo-preview")
 
     return answers
 
