@@ -1,7 +1,6 @@
 import os
 from lyzr import QABot
 from dotenv import load_dotenv; load_dotenv()
-from utils import utils
 from pathlib import Path
 
 

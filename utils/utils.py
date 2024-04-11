@@ -84,6 +84,10 @@ def style_app():
     .app-header { visibility: hidden; }
     .css-18e3th9 { padding-top: 0; padding-bottom: 0; }
     .css-1d391kg { padding-top: 1rem; padding-right: 1rem; padding-bottom: 1rem; padding-left: 1rem; }
+    [data-testid="stSidebar"][aria-expanded="true"]{
+           min-width: 450px;
+           max-width: 450px;
+       }
     </style>
     """, unsafe_allow_html=True)
 
